@@ -6,6 +6,7 @@ def parse_csv(
     filename, 
     count=True, 
     write=True, 
+    has_headers=True,
     compatibility={
             'chrome': [49],
             'safari': [10, 1],
@@ -15,7 +16,7 @@ def parse_csv(
         }
 ):
     '''
-    Parse a CSV file of raw UAs into separate CSVs by browser
+    Parse a CSV file of raw UAs into separate CSVs by browser and print the results
     '''
     with open(filename) as f:
         rows = csv.reader(f)
@@ -27,7 +28,9 @@ def parse_csv(
             return str1
 
         records = []
-
+        # Read the file headers if they exist
+        if has_headers:
+            headers = next(rows)
         for row in rows:
             if not row:    # Skip rows with no data
                 continue
@@ -94,80 +97,22 @@ def parse_csv(
             print("Opera: ", len(opera_records), "Unsupported: ", len(rejected_opera_records))
             print("Other: ", len(other_records), "Unsupported: ???")
 
-        if write:
+        def write_to_file(arr, file):
             try:
-                with open('Data/parsed_chrome_uas.csv', 'w') as csvfile:
+                with open(file, 'w') as csvfile:
                     writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
                     writer.writeheader()
-                    for record in chrome_records:
-                        writer.writerow(record)
-            except IOError as e:
-                print(e)
-            except AttributeError as e:
-                print(e)
-                
-            try:
-                with open('Data/rejected_safari_uas.csv', 'w') as csvfile:
-                    writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
-                    writer.writeheader()
-                    for record in rejected_safari_records:
+                    for record in arr:
                         writer.writerow(record)
             except IOError as e:
                 print(e)
             except AttributeError as e:
                 print(e)
 
-            try:
-                with open('Data/parsed_safari_uas.csv', 'w') as csvfile:
-                    writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
-                    writer.writeheader()
-                    for record in safari_records:
-                        writer.writerow(record)
-            except IOError as e:
-                print(e)
-            except AttributeError as e:
-                print(e)
-                
-            try:
-                with open('Data/parsed_edge_uas.csv', 'w') as csvfile:
-                    writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
-                    writer.writeheader()
-                    for record in edge_records:
-                        writer.writerow(record)
-            except IOError as e:
-                print(e)
-            except AttributeError as e:
-                print(e)
-            
-            try:
-                with open('Data/parsed_opera_uas.csv', 'w') as csvfile:
-                    writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
-                    writer.writeheader()
-                    for record in opera_records:
-                        writer.writerow(record)
-            except IOError as e:
-                print(e)
-            except AttributeError as e:
-                print(e)
-            
-            try:
-                with open('Data/parsed_firefox_uas.csv', 'w') as csvfile:
-                    writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
-                    writer.writeheader()
-                    for record in firefox_records:
-                        writer.writerow(record)
-            except IOError as e:
-                print(e)
-            except AttributeError as e:
-                print(e)
-            
-            try:
-                with open('Data/parsed_other_uas.csv', 'w') as csvfile:
-                    writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
-                    writer.writeheader()
-                    for record in other_records:
-                        writer.writerow(record)
-            except IOError as e:
-                print(e)
-            except AttributeError as e:
-                print(e)
+        if write:
+            write_to_file(safari_records, 'Data/parsed_safari_uas.csv')
+            write_to_file(chrome_records, 'Data/parsed_chrome_uas.csv')
+            write_to_file(edge_records, 'Data/parsed_edge_uas.csv')
+            write_to_file(firefox_records, 'Data/parsed_firefox_uas.csv')
+            write_to_file(opera_records, 'Data/parsed_opera_uas.csv')
+            write_to_file(other_records, 'Data/parsed_other_uas.csv')  
